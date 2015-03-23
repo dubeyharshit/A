@@ -7,39 +7,37 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * A simple client that requests a greeting from the {@link HelloWorldServer}.
- */
 
 public class PollClient {
 	  private static final Logger logger = Logger.getLogger(PollClient.class.getName());
 
 	  private final ChannelImpl channel;
-	  private final GreeterGrpc.GreeterBlockingStub blockingStub;
+	  private final PollServiceGrpc.PollServiceBlockingStub blockingStub;
 
 	  public PollClient(String host, int port) {
 	    channel =
 	        NettyChannelBuilder.forAddress(host, port).negotiationType(NegotiationType.PLAINTEXT)
 	            .build();
-	    blockingStub = GreeterGrpc.newBlockingStub(channel);
+	    blockingStub = PollServiceGrpc.newBlockingStub(channel);
 	  }
 
 	  public void shutdown() throws InterruptedException {
 	    channel.shutdown().awaitTerminated(5, TimeUnit.SECONDS);
 	  }
 
-	  public void greet(String question, String start_at, String expired_at, String choice) {
+	  public void creatingPoll(String moderatorId, String question, String startedAt, String expiredAt, String[] choice) {
 	    try {
 	      logger.info("Starting Transmission");
 	      
-	      PollRequest request1 = PollRequest.newBuilder().setQuestion(question).build();
-	      PollRequest request2 = PollRequest.newBuilder().setStart_at(start_at).build();
-	      PollRequest request3 = PollRequest.newBuilder().setExpired_at(expired_at).build();
-	      PollRequest request4 = PollRequest.newBuilder().setChoice(choice).build();
+	      PollRequest request1 = PollRequest.newBuilder().setModeratorId(moderatorId).build();
+	      PollRequest request2 = PollRequest.newBuilder().setQuestion(question).build();
+	      PollRequest request3 = PollRequest.newBuilder().setStart_at(startedAt).build();
+	      PollRequest request4 = PollRequest.newBuilder().setExpired_at(expiredAt).build();
+	      PollRequest request5 = PollRequest.newBuilder().setChoice(choice).build();
 
-	      PollResponse response = blockingStub.sayPoll(request1,request2,request3,request4);
+	      PollResponse response = blockingStub.createPoll(request1,request2,request3,request4,request5);
 	      
-	      logger.info("Details: " + response.getMessage());
+	      logger.info("ID " + response.getId());
 
 	    } catch (RuntimeException e) {
 	      logger.log(Level.WARNING, "RPC failed", e);
@@ -52,18 +50,23 @@ public class PollClient {
 	    try {
 	      /* Access a service running on the local machine on port 50051 */
 	      //String user = "world";
-	      String question = "What type of smartphone do you have?";
-	      String started_at = "2015-02-23T13:00:00.000Z";
-	      String expired_at = "2015-02-24T13:00:00.000Z";
-	      String choice = "Android";
+	      	
+	    	String moderatorId = "1";
+            String question = "What type of smartphone do you have?";
+            String startedAt = "2015-03-18T13:00:00.000Z";
+            String expiredAt = "2015-03-19T13:00:00.000Z";
+            String[] choice = new String[] { "Android", "iPhone" };
 	      
 	      if (args.length > 0) {
-	        question = args[0]; /* Use the arg as the name to greet if provided */
-	        started_at = args[1]; /* Use the arg as the name to greet if provided */
-	        expired_at = args[2]; /* Use the arg as the name to greet if provided */
-	        choice = args[3]; /* Use the arg as the name to greet if provided */
+	    	
+	    	moderatorId = args[0];
+	        question = args[1]; 
+	        startedAt = args[2]; 
+	        expiredAt = args[3]; 
+	        choice[0] = args[4]; 
+	        choice[1] = args[5];
 	      }
-	      client.greet(question,started_at,expired_at,choice);
+	      client.creatingPoll(moderatorId,question,startedAt,expiredAt,choice);
 
 	    } finally {
 	      client.shutdown();

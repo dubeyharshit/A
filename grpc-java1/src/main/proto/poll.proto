@@ -1,29 +1,24 @@
 syntax = "proto3";
-
-package grpc.example.proto;
-
+package = io.grpc.examples.proto;
 option java_multiple_files = true;
 option java_package = "io.grpc.examples.proto";
-option java_outer_classname = "PollProto";
+option java_outer_classname = "PollServiceProto";
 
-// The greeting service definition.
-service Greeter {
-  // Sends a greeting
-  rpc SayPoll (PollRequest) returns (PollResponse) {}
+
+
+// The poll service definition.
+service PollService {
+ // creates a poll
+ rpc CreatePoll (PollRequest) returns (PollResponse) {}
 }
-
-// The request message containing the user's name.
-message HelloRequest {
- string question = 1;
- string started_at = 2;
- string expired_at = 3;
- string choice = 4;
+message PollRequest {
+ string moderatorId = 1;
+ string question = 2;
+ string startedAt = 3;
+ string expiredAt = 4;
+ repeated string choice = 5;
 }
-
-// The response message containing the greetings
-message HelloResponse {
- string question = 1;
- string started_at = 2;
- string expired_at = 3;
- string choice = 4;
+// The response message containing the new poll id
+message PollResponse {
+ string id = 1;
 }

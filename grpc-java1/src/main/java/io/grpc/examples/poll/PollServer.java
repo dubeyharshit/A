@@ -7,7 +7,7 @@ import io.grpc.transport.netty.NettyServerBuilder;
 import java.util.logging.Logger;
 
 /**
- * Server that manages startup/shutdown of a {@code Greeter} server.
+ * Server that manages startup/shutdown of a {@code Poll} server.
  */
 
 public class PollServer {
@@ -19,7 +19,7 @@ public class PollServer {
 
 	  private void start() throws Exception {
 	    server = NettyServerBuilder.forPort(port)
-	        .addService(GreeterGrpc.bindService(new GreeterImpl()))
+	        .addService(PollServiceGrpc.bindService(new PollImpl()))
 	        .build().start();
 	    logger.info("Server started, listening on " + port);
 	    Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -47,11 +47,11 @@ public class PollServer {
 	    server.start();
 	  }
 
-	  private class GreeterImpl implements GreeterGrpc.Greeter {
+	  private class PollImpl implements PollServiceGrpc.PollService {
 
 	    @Override
-	    public void sayHello(PollRequest req, StreamObserver<PollResponse> responseObserver) {
-	      PollResponse reply = PollResponse.newBuilder().setMessage(req.getQuestion() + req.getStarted_at() + req.getExpired_at() + req.getChoice()).build();
+	    public void createPoll(PollRequest req, StreamObserver<PollResponse> responseObserver) {
+	      PollResponse reply = PollResponse.newBuilder().setMessage(req.getModeratorId()).build();
 	      responseObserver.onValue(reply);
 	      responseObserver.onCompleted();
 	    }
